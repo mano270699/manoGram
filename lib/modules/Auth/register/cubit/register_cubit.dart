@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:manogram/models/social_user_model.dart';
 import 'package:manogram/modules/Auth/register/cubit/register_states.dart';
+import 'package:manogram/shared/component/constant.dart';
 
 class SocialRegisterCubit extends Cubit<SocialRegisterStates> {
   SocialRegisterCubit() : super(SocialRegisterInitalStates());
@@ -29,7 +30,7 @@ class SocialRegisterCubit extends Cubit<SocialRegisterStates> {
         password: password,
       )
           .then((value) {
-        //  emit(SocialRegisterSuccesStates());
+        emit(SocialRegisterSuccesStates(value.user!.uid));
         // print(value.user!.email);
         userCreate(
           name: name,
@@ -59,6 +60,19 @@ class SocialRegisterCubit extends Cubit<SocialRegisterStates> {
     //   print(error.toString());
     //   emit(SocialRegisterErrorStates(error.toString()));
     // });
+  }
+
+  SocialUserModel? userModel;
+  void getUser() {
+    emit(SocialLayoutGetUserLoadingState());
+    FirebaseFirestore.instance.collection('user').doc(uId).get().then((value) {
+      print(value.data());
+      userModel = SocialUserModel.fromjson(value.data()!);
+      emit(SocialLayoutGetUserSucssesState());
+    }).catchError((error) {
+      print(error.toString());
+      emit(SocialLayoutGetUserErrorState());
+    });
   }
 
   void userCreate({

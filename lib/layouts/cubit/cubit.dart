@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +12,7 @@ import 'package:manogram/modules/new_post/new_post_screen.dart';
 import 'package:manogram/modules/settings/setting_screen.dart';
 import 'package:manogram/modules/users/users_screen.dart';
 import 'package:manogram/shared/component/constant.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class LayoutCubit extends Cubit<SocialLayoutStates> {
   LayoutCubit() : super(SocialIntialState());
@@ -50,17 +50,28 @@ class LayoutCubit extends Cubit<SocialLayoutStates> {
   }
 
   // ignore: unused_field
-  XFile? imageprofile;
+  File? imageCover;
 
-  final ImagePicker _picker = ImagePicker();
-  Future<void> getImageProfile() async {
-    // ignore: deprecated_member_use
+  Future<void> getCoverImage() async {
+    final pickedCoverFile =
+        // ignore: deprecated_member_use
+        await picker.pickImage(source: ImageSource.gallery);
+    if (pickedCoverFile != null) {
+      imageCover = File(pickedCoverFile.path);
+      emit(SocialGetCoverProfileSucssesState());
+    } else {
+      print('no selected images');
+      emit(SocialGetCoverProfileErrorState());
+    }
+  }
 
-    // Pick an image
-    imageprofile = await _picker.pickImage(source: ImageSource.gallery);
-
-    if (imageprofile != null) {
-      imageprofile = XFile(imageprofile!.path);
+  File? imageProfile;
+  final picker = ImagePicker();
+  Future<void> getProfileImage() async {
+    final pickedProfileFile =
+        await picker.pickImage(source: ImageSource.gallery);
+    if (pickedProfileFile != null) {
+      imageProfile = File(pickedProfileFile.path);
       emit(SocialGetImageProfileSucssesState());
     } else {
       print('no selected images');
@@ -68,19 +79,103 @@ class LayoutCubit extends Cubit<SocialLayoutStates> {
     }
   }
 
-  // ignore: unused_field
-  File? imageCover;
-  final pickerImageCover = ImagePicker();
-  Future<void> getCoverImage() async {
-    final pickedCoverFile =
-        // ignore: deprecated_member_use
-        await pickerImageCover.getImage(source: ImageSource.gallery);
-    if (pickedCoverFile != null) {
-      imageCover = File(pickedCoverFile.path);
-      emit(SocialGetImageProfileSucssesState());
-    } else {
-      print('no selected images');
-      emit(SocialGetImageProfileErrorState());
-    }
+  void uploadProfileImage({
+    required String name,
+    required String bio,
+    required String phone,
+  }) {
+    emit(SocialUpdateProfileLoadingState());
+    firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('user/${Uri.file(imageProfile!.path).pathSegments.last}')
+        .putFile(imageProfile!)
+        .then((value) {
+      value.ref.getDownloadURL().then((imageUrl) {
+        // emit(SocialUploadImageProfileSucssesState());
+
+        updatUserData(name: name, bio: bio, phone: phone, image: imageUrl);
+        imageProfile = null;
+      }).catchError((onError) {
+        emit(SocialUploadImageProfileErrorState());
+        print(onError);
+      });
+    }).catchError((onError) {
+      emit(SocialUploadImageProfileErrorState());
+    });
+  }
+
+  void uploadCoverImage({
+    required String name,
+    required String bio,
+    required String phone,
+  }) {
+    emit(SocialUpdateCoverLoadingState());
+    firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('user/${Uri.file(imageCover!.path).pathSegments.last}')
+        .putFile(imageCover!)
+        .then((value) {
+      value.ref.getDownloadURL().then((coverUrl) {
+        updatUserData(
+          name: name,
+          bio: bio,
+          phone: phone,
+          cover: coverUrl,
+        );
+        imageCover = null;
+      }).catchError((onError) {
+        emit(SocialUploadCoverProfileErrorState());
+        print(onError);
+      });
+    }).catchError((onError) {
+      emit(SocialUploadCoverProfileErrorState());
+    });
+  }
+
+  // void updateUser({
+  //   required String name,
+  //   required String bio,
+  //   required String phone,
+  // }) {
+  //   emit(SocialUserUpdateLoadingState());
+  //   if (imageCover != null) {
+  //     uploadCoverImage();
+  //   } else if (imageProfile != null) {
+  //     uploadProfileImage();
+  //   } else if (imageCover != null && imageProfile != null) {
+  //   } else {
+  //     updatUserData(
+  //       name: name,
+  //       bio: bio,
+  //       phone: phone,
+  //     );
+  //   }
+  // }
+
+  void updatUserData({
+    required String name,
+    required String bio,
+    required String phone,
+    String? cover,
+    String? image,
+  }) {
+    SocialUserModel user = SocialUserModel(
+        name: name,
+        phone: phone,
+        isEmailVirified: false,
+        bio: bio,
+        cover: cover ?? userModel!.cover,
+        email: userModel!.email,
+        uId: userModel!.uId,
+        image: image ?? userModel!.image);
+    FirebaseFirestore.instance
+        .collection('user')
+        .doc(user.uId)
+        .update(user.toMap())
+        .then((value) {
+      getUser();
+    }).catchError((onError) {
+      emit(SocialUserUpdateErrorState());
+    });
   }
 }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_conditional_rendering/flutter_conditional_rendering.dart';
-import 'package:manogram/layouts/cubit/cubit.dart';
+
 import 'package:manogram/layouts/social_app_layout.dart';
 import 'package:manogram/modules/Auth/login/login_screen.dart';
 import 'package:manogram/modules/Auth/register/cubit/register_cubit.dart';
 import 'package:manogram/modules/Auth/register/cubit/register_states.dart';
 import 'package:manogram/shared/component/components.dart';
+
+import 'package:manogram/shared/network/local/cache_helper.dart';
 import 'package:manogram/shared/style/colors.dart';
 
 // ignore: must_be_immutable
@@ -22,9 +24,13 @@ class RegisterScreen extends StatelessWidget {
       create: (context) => SocialRegisterCubit(),
       child: BlocConsumer<SocialRegisterCubit, SocialRegisterStates>(
         listener: (context, states) {
-          if (states is SocialCreateUserSuccesStates) {
-            LayoutCubit.get(context).getUser();
-            navigateAndFinish(context, SocialLayout());
+          if (states is SocialRegisterSuccesStates) {
+            CacheHelper.saveUserData(
+              key: 'uId',
+              value: states.uId,
+            ).then((value) {
+              navigateAndFinish(context, SocialLayout());
+            });
           }
         },
         builder: (context, state) {
@@ -154,6 +160,7 @@ class RegisterScreen extends StatelessWidget {
                                     email: email.text.toString(),
                                     password: password.text.toString(),
                                   );
+                                  SocialRegisterCubit.get(context).getUser();
                                 }
                               },
                               child: Text(

@@ -32,7 +32,7 @@ Widget defaultButton({
 
       //margin: const EdgeInsetsDirectional.only(start: 70, end: 70),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(3),
         color: color,
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
