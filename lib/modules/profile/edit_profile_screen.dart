@@ -13,12 +13,12 @@ class EditProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<LayoutCubit, SocialLayoutStates>(
+    return BlocConsumer<SocialCubit, SocialLayoutStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        var userModel = LayoutCubit.get(context).userModel;
-        var profileImage = LayoutCubit.get(context).imageProfile;
-        var imageCover = LayoutCubit.get(context).imageCover;
+        var userModel = SocialCubit.get(context).userModel;
+        var profileImage = SocialCubit.get(context).imageProfile;
+        var imageCover = SocialCubit.get(context).imageCover;
         nameController.text = userModel!.name!;
         bioController.text = userModel.bio!;
         phoneController.text = userModel.phone!;
@@ -29,7 +29,7 @@ class EditProfileScreen extends StatelessWidget {
             action: [
               TextButton(
                 onPressed: () {
-                  LayoutCubit.get(context).updatUserData(
+                  SocialCubit.get(context).updatUserData(
                     name: nameController.text,
                     bio: bioController.text,
                     phone: phoneController.text,
@@ -102,7 +102,7 @@ class EditProfileScreen extends StatelessWidget {
                                     radius: 18,
                                     child: IconButton(
                                         onPressed: () {
-                                          LayoutCubit.get(context)
+                                          SocialCubit.get(context)
                                               .getProfileImage();
                                         },
                                         icon: Icon(
@@ -120,7 +120,7 @@ class EditProfileScreen extends StatelessWidget {
                             radius: 18,
                             child: IconButton(
                                 onPressed: () {
-                                  LayoutCubit.get(context).getCoverImage();
+                                  SocialCubit.get(context).getCoverImage();
                                 },
                                 icon: Icon(
                                   IconBroken.Camera,
@@ -131,18 +131,18 @@ class EditProfileScreen extends StatelessWidget {
                   SizedBox(
                     height: 20,
                   ),
-                  if (LayoutCubit.get(context).imageProfile != null ||
-                      LayoutCubit.get(context).imageCover != null)
+                  if (SocialCubit.get(context).imageProfile != null ||
+                      SocialCubit.get(context).imageCover != null)
                     Row(
                       children: [
-                        if (LayoutCubit.get(context).imageProfile != null)
+                        if (SocialCubit.get(context).imageProfile != null)
                           Expanded(
                               child: Column(
                             children: [
                               defaultButton(
                                   text: 'upload profile',
                                   function: () {
-                                    LayoutCubit.get(context).uploadProfileImage(
+                                    SocialCubit.get(context).uploadProfileImage(
                                         name: nameController.text,
                                         bio: bioController.text,
                                         phone: phoneController.text);
@@ -157,14 +157,14 @@ class EditProfileScreen extends StatelessWidget {
                         SizedBox(
                           width: 5,
                         ),
-                        if (LayoutCubit.get(context).imageCover != null)
+                        if (SocialCubit.get(context).imageCover != null)
                           Expanded(
                               child: Column(
                             children: [
                               defaultButton(
                                   text: 'upload cover',
                                   function: () {
-                                    LayoutCubit.get(context).uploadCoverImage(
+                                    SocialCubit.get(context).uploadCoverImage(
                                         name: nameController.text,
                                         bio: bioController.text,
                                         phone: phoneController.text);

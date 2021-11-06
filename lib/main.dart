@@ -38,8 +38,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        create: (context) => LayoutCubit()..getUser(),
-        child: BlocConsumer<LayoutCubit, SocialLayoutStates>(
+        create: (context) => SocialCubit()
+          ..getUser()
+          ..getPosts(),
+        child: BlocConsumer<SocialCubit, SocialLayoutStates>(
           listener: (context, state) {},
           builder: (context, state) {
             return MaterialApp(

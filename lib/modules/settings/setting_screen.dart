@@ -11,10 +11,10 @@ class SettingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<LayoutCubit, SocialLayoutStates>(
+    return BlocConsumer<SocialCubit, SocialLayoutStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        var userModel = LayoutCubit.get(context).userModel;
+        var userModel = SocialCubit.get(context).userModel;
 
         return Padding(
           padding: const EdgeInsets.all(8.0),

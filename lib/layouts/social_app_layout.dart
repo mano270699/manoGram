@@ -14,14 +14,14 @@ class SocialLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<LayoutCubit, SocialLayoutStates>(
+    return BlocConsumer<SocialCubit, SocialLayoutStates>(
       listener: (context, state) {
         if (state is SocialNewPostState) {
           navigateTo(context, NewPostScreen());
         }
       },
       builder: (context, state) {
-        var cubit = LayoutCubit.get(context);
+        var cubit = SocialCubit.get(context);
 
         return Conditional.single(
             context: context,
