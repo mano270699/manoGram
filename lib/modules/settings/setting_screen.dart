@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:manogram/layouts/cubit/cubit.dart';
 import 'package:manogram/layouts/cubit/state.dart';
+import 'package:manogram/modules/Auth/login/login_screen.dart';
 import 'package:manogram/modules/profile/edit_profile_screen.dart';
 import 'package:manogram/shared/component/components.dart';
+import 'package:manogram/shared/network/local/cache_helper.dart';
 import 'package:manogram/shared/style/icon_broken.dart';
 
 class SettingScreen extends StatelessWidget {
@@ -200,6 +202,28 @@ class SettingScreen extends StatelessWidget {
                       },
                       child: Icon(
                         IconBroken.Edit,
+                      ))
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      child: Text('Logout'),
+                      onPressed: () {},
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  OutlinedButton(
+                      onPressed: () {
+                        SocialCubit.get(context).logOut();
+                        CacheHelper.removeData(key: 'uId');
+                        navigateAndFinish(context, LoginScreen());
+                      },
+                      child: Icon(
+                        IconBroken.Logout,
                       ))
                 ],
               ),

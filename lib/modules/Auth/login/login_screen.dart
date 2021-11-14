@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_conditional_rendering/flutter_conditional_rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:manogram/layouts/social_app_layout.dart';
 import 'package:manogram/modules/Auth/login/cubit/login_cubit.dart';
 
@@ -25,6 +26,27 @@ class LoginScreen extends StatelessWidget {
     return BlocProvider(
       create: (BuildContext context) => SocialLoginCubit(),
       child: BlocConsumer<SocialLoginCubit, SocialLoginStates>(
+        listener: (context, states) {
+          if (states is SocialLoginErrorStates) {
+            Fluttertoast.showToast(
+                msg: states.error,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          if (states is SocialLoginSuccesStates) {
+            CacheHelper.saveUserData(
+              key: 'uId',
+              value: states.uId,
+            ).then((value) {
+              print(value.toString());
+              navigateAndFinish(context, SocialLayout());
+            });
+          }
+        },
         builder: (context, states) {
           return Scaffold(
             body: Center(
@@ -154,26 +176,6 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
           );
-        },
-        listener: (context, states) {
-          if (states is SocialLoginErrorStates) {
-            Fluttertoast.showToast(
-                msg: states.error,
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.CENTER,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-                fontSize: 16.0);
-          }
-          if (states is SocialLoginSuccesStates) {
-            CacheHelper.saveUserData(
-              key: 'uId',
-              value: states.uId,
-            ).then((value) {
-              navigateAndFinish(context, SocialLayout());
-            });
-          }
         },
       ),
     );

@@ -4,6 +4,8 @@ import 'package:flutter_conditional_rendering/conditional.dart';
 import 'package:manogram/layouts/cubit/cubit.dart';
 import 'package:manogram/layouts/cubit/state.dart';
 import 'package:manogram/models/post_model.dart';
+import 'package:manogram/modules/comments/comment_screen.dart';
+import 'package:manogram/shared/component/components.dart';
 import 'package:manogram/shared/component/shammer.dart';
 import 'package:manogram/shared/style/icon_broken.dart';
 
@@ -17,6 +19,7 @@ class HomeScreen extends StatelessWidget {
       body: BlocConsumer<SocialCubit, SocialLayoutStates>(
         listener: (context, state) {},
         builder: (context, state) {
+          print('num of post: ${SocialCubit.get(context).post.length}');
           return Conditional.single(
               context: context,
               conditionBuilder: (context) =>
@@ -58,11 +61,13 @@ class HomeScreen extends StatelessWidget {
                           height: 10,
                         ),
                         ListView.separated(
-                          separatorBuilder: (context, int) => SizedBox(
+                          separatorBuilder: (context, index) => SizedBox(
                             height: 10,
                           ),
-                          itemBuilder: (context, int) =>
-                              buildPostItem(SocialCubit.get(context).post[int]),
+                          itemBuilder: (context, index) => buildPostItem(
+                              SocialCubit.get(context).post[index],
+                              context,
+                              index),
                           itemCount: SocialCubit.get(context).post.length,
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
@@ -73,13 +78,27 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-              fallbackBuilder: (context) => ShimmerList());
+              fallbackBuilder: (context) {
+                print('in Home fallbackBuilder');
+                if (SocialCubit.get(context).post.length == 0) print('print 0');
+                return ShimmerList();
+                // ignore: unrelated_type_equality_checks
+                // if (SocialCubit.get(context).post.length == 0) {
+                //   return Center(
+                //       child: Text(
+                //     "no Data :(",
+                //     style: TextStyle(color: Colors.black),
+                //   ));
+                // } else {
+
+                // }
+              });
         },
       ),
     );
   }
 
-  Widget buildPostItem(PostModel model) => Card(
+  Widget buildPostItem(PostModel model, context, index) => Card(
         clipBehavior: Clip.antiAliasWithSaveLayer,
         elevation: 10.0,
         margin: EdgeInsets.symmetric(
@@ -88,6 +107,7 @@ class HomeScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
@@ -250,7 +270,7 @@ class HomeScreen extends StatelessWidget {
                               width: 5,
                             ),
                             Text(
-                              '0',
+                              '${SocialCubit.get(context).likes[index]}',
                               style: TextStyle(color: Colors.grey),
                             ),
                           ],
@@ -292,18 +312,21 @@ class HomeScreen extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: InkWell(
-                  onTap: () {},
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 18,
-                        backgroundImage: NetworkImage('${model.image}'),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundImage: NetworkImage(
+                          '${SocialCubit.get(context).userModel!.image}'),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        navigateTo(context, CommentScreen());
+                      },
+                      child: Text(
                         'Write a comment...',
                         style: TextStyle(
                           fontSize: 14,
@@ -311,28 +334,33 @@ class HomeScreen extends StatelessWidget {
                           color: Colors.grey,
                         ),
                       ),
-                      Spacer(),
-                      InkWell(
-                        onTap: () {},
-                        child: Row(
-                          children: [
-                            Icon(
-                              IconBroken.Heart,
-                              color: Colors.red,
-                              size: 18,
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              'Like',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ],
-                        ),
+                    ),
+                    Spacer(),
+                    InkWell(
+                      onTap: () {
+                        SocialCubit.get(context)
+                            .likePost(SocialCubit.get(context).postId[index]);
+
+                        SocialCubit.get(context).getPosts();
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            IconBroken.Heart,
+                            color: Colors.red,
+                            size: 18,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            'Like',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],

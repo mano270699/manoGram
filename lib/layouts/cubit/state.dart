@@ -14,6 +14,16 @@ class SocialLayoutGetUserErrorState extends SocialLayoutStates {
   SocialLayoutGetUserErrorState(this.error);
 }
 
+class SocialGetAllUsersLoadingState extends SocialLayoutStates {}
+
+class SocialGetAllUsersSucssesState extends SocialLayoutStates {}
+
+class SocialGetAllUsersErrorState extends SocialLayoutStates {
+  final String error;
+
+  SocialGetAllUsersErrorState(this.error);
+}
+
 class SocialNewPostState extends SocialLayoutStates {}
 
 class SocialGetImageProfileSucssesState extends SocialLayoutStates {}
@@ -50,12 +60,28 @@ class SocialCreatePostErrorState extends SocialLayoutStates {}
 
 class SocialRemovePostImageSucssesState extends SocialLayoutStates {}
 
-class SocialGetPostsLoadingState extends SocialLayoutStates {}
+class SocialLikePostSucssesState extends SocialLayoutStates {}
+
+class SocialLikePostErrorState extends SocialLayoutStates {
+  final String error;
+
+  SocialLikePostErrorState(this.error);
+}
 
 class SocialGetPostsSucssesState extends SocialLayoutStates {}
+
+class SocialGetPostsLoadingState extends SocialLayoutStates {}
 
 class SocialGetPostsErrorState extends SocialLayoutStates {
   final String error;
 
   SocialGetPostsErrorState(this.error);
 }
+
+class SocialSendMessageSucssesState extends SocialLayoutStates {}
+
+class SocialSendMessageErrorState extends SocialLayoutStates {}
+
+class SocialGetMessageSucssesState extends SocialLayoutStates {}
+
+class SocialGetMessageErrorState extends SocialLayoutStates {}
